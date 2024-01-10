@@ -2,7 +2,7 @@ FROM ubuntu:22.04
 
 #User Settings for VNC
 ENV USER=root
-ENV PASSWORD=password1
+ENV PASSWORD=123456
 
 #Variables for installation
 ENV DEBIAN_FRONTEND=noninteractive
@@ -23,6 +23,7 @@ RUN add-apt-repository ppa:libretro/stable && \
 
 #Copy the files for audio and NGINX
 COPY default.pa client.conf /etc/pulse/
+COPY daemon.conf /etc/pulse/daemon.conf
 COPY nginx.conf /etc/nginx/
 COPY webaudio.js /usr/share/novnc/core/
 
@@ -44,26 +45,29 @@ RUN sed -i "/import RFB/a \
     /usr/share/novnc/app/ui.js
 				
 #Install VirtualGL and TurboVNC		
-RUN  wget https://gigenet.dl.sourceforge.net/project/virtualgl/3.1/virtualgl_3.1_amd64.deb && \
-        wget https://zenlayer.dl.sourceforge.net/project/turbovnc/3.0.3/turbovnc_3.0.3_amd64.deb && \
+RUN  wget https://github.com/VirtualGL/virtualgl/releases/download/3.1/virtualgl_3.1_arm64.deb && \
+        wget https://github.com/TurboVNC/turbovnc/releases/download/3.1/turbovnc_3.1_arm64.deb && \
         dpkg -i virtualgl_*.deb && \
+        rm virtualgl_*.deb && \
         dpkg -i turbovnc_*.deb && \
+        rm turbovnc_*.deb && \
         mkdir ~/.vnc/ && \
-        mkdir ~/.dosbox && \
         echo $PASSWORD | vncpasswd -f > ~/.vnc/passwd && \
         chmod 0600 ~/.vnc/passwd && \
-        echo "set border 1" > ~/.ratpoisonrc  && \
-        echo "exec retroarch">> ~/.ratpoisonrc && \
+        echo "/opt/TurboVNC/bin/vncserver -kill :1" > ~/.ratpoisonrc && \
+        echo "set border 1" >> ~/.ratpoisonrc  && \
+        echo "exec retroarch" >> ~/.ratpoisonrc && \
         openssl req -x509 -nodes -newkey rsa:2048 -keyout ~/novnc.pem -out ~/novnc.pem -days 3650 -subj "/C=US/ST=NY/L=NY/O=NY/OU=NY/CN=NY emailAddress=email@example.com"
 
 EXPOSE 80
 
 #MKDir for ROMS
-RUN mkdir /roms
+RUN mkdir /root/retroarch_data
 
 #Copy in RetoArch config to remap keys
 COPY retroarch.cfg /root/.config/retroarch/retroarch.cfg
 
-#Copy in supervisor configuration for startup
+#Copy in supervisor configuration and entrypoint for startup
 COPY supervisord.conf /etc/supervisor/supervisord.conf
-ENTRYPOINT [ "supervisord", "-c", "/etc/supervisor/supervisord.conf" ]
+COPY entrypoint.sh /root/entrypoint.sh
+ENTRYPOINT [ "/bin/sh", "/root/entrypoint.sh" ]

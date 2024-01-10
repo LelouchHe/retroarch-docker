@@ -1,3 +1,25 @@
+# Run retroarch in container on arm64 machine
+
+* build: `docker build -t retroarch .`
+* run: `docker run -d --name retroarch -v /path/to/retroarch_data:/root/retroarch_data -p 9090:80 retroarch`
+
+In `retroarch_data`, there should be 5 folders:
+
+1. `cores`: required. since retroarch doesn't support arm64 officially, the cores can't be updated online. You need to have them ready when playing it. Possible source: [https://github.com/christianhaitian/retroarch-cores]
+2. `rom`: required. rom folders
+3. `system`: required for some platforms that need special bios
+4. `playlists`: optional. you can have retroarch to scan your roms to get one
+5. `thumbnails`: optional. you can have retroarch to download the arts
+
+All directories can be changed from retroarch. This is just what works for me.
+
+# Remaining issue
+
+1. sound is sometimes broken. the screen can't be too large, or the sound will be terrible.
+2. Chinese locale doesn't work
+
+# Original README
+
 # RETRTOARCH IN A CONTAINER PLAYABLE THROUGH A BROWSER
 
 [<img src="retroarch.jpg" width="50%">](https://www.youtube.com/watch?v=6gqXNirjNeU "RETRTOARCH IN A CONTAINER")
@@ -8,7 +30,7 @@ The implementation is pretty straightforward. You can run it locally, or run it 
 
 If you want to build it, simply clone the repo and run Docker Build.
 
-`docker build -t retroarch . ` 
+`docker build -t retroarch . `
 
 Alternately, you can pull the image from Docker Hub.
 
