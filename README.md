@@ -5,7 +5,7 @@
 
 In `retroarch_data`, there should be 5 folders:
 
-1. `cores`: required. since retroarch doesn't support arm64 officially, the cores can't be updated online. You need to have them ready when playing it. Possible source: [https://github.com/christianhaitian/retroarch-cores]
+1. `cores`: required. since retroarch doesn't support arm64 officially, the cores can't be updated online. You need to have them ready when playing it. Possible source: <https://github.com/christianhaitian/retroarch-cores>
 2. `rom`: required. rom folders
 3. `system`: required for some platforms that need special bios
 4. `playlists`: optional. you can have retroarch to scan your roms to get one
